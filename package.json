@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/SudarsanRamachandran/speech_to_text/issues"
   },
-  "homepage": "https://github.com/SudarsanRamachandran/speech_to_text#readme"
+  "homepage": "https://github.com/SudarsanRamachandran/speech_to_text#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
