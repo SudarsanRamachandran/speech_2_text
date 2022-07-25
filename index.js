@@ -1,44 +1,57 @@
-const express = require('express');
-const port = process.env.PORT || 3000
-const bodyParser = require('body-parser');
-const app = express();
+const recorder = require('node-record-lpcm16');
+const { spawn } = require('child_process')
 
 
+// Imports the Google Cloud client library
+const speech = require('@google-cloud/speech');
+const encoding = 'LINEAR16';
+const sampleRateHertz = 16000;
+const languageCode = 'en-US';
 
-//initialize sentry logging
+// Creates a client
+const client = new speech.SpeechClient();
 
 
-app.use(bodyParser.json())
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
+const request = {
+  config: {
+    encoding: encoding,
+    sampleRateHertz: sampleRateHertz,
+    languageCode: languageCode,
+  },
+  interimResults: false, // If you want interim results, set this to true
+};
+
+// Create a recognize stream
+const recognizeStream = client
+  .streamingRecognize(request)
+  .on('error', console.error)
+  .on('data', data =>
+    process.stdout.write(
+      data.results[0] && data.results[0].alternatives[0]
+        ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
+        : '\n\nReached transcription time limit, press Ctrl+C\n'
+    )
+  );
+
+//   spawn('node', ['index.js'], {
+//     env: {
+//         NODE_ENV: 'development',
+//         PATH: process.env.PATH
+//     }
+// })
+
+console.log('before recorder')
+recorder
+  .record({
+    sampleRateHertz: sampleRateHertz,
+    threshold: 0,
+    verbose: false,
+    recordProgram: 'rec', 
+    silence: '10.0',
   })
-)
+  .stream()
+  .on('error', console.error)
+  .pipe(recognizeStream);
 
-//default GET request
-app.get(['/', '/health'], function (req, res) {
-    res.send('node is up');
-    
-
-});
-
-
-
-
-
-
-
-app.listen(port, async function () {
-    console.log(`project is up: ${process.env.NODE_ENV}`);
- 
-
-
-
- 
- 
-   
-
-});
-
-
-
+console.log('Listening, press Ctrl+C to stop.');
+console.log('after record')
