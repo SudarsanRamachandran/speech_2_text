@@ -1,57 +1,44 @@
-const recorder = require('node-record-lpcm16');
-const { spawn } = require('child_process')
-
-
-// Imports the Google Cloud client library
-const speech = require('@google-cloud/speech');
-const encoding = 'LINEAR16';
-const sampleRateHertz = 16000;
-const languageCode = 'en-US';
-
-// Creates a client
-const client = new speech.SpeechClient();
-
-
-const request = {
-  config: {
-    encoding: encoding,
-    sampleRateHertz: sampleRateHertz,
-    languageCode: languageCode,
-  },
-  interimResults: false, // If you want interim results, set this to true
-};
-
-// Create a recognize stream
-const recognizeStream = client
-  .streamingRecognize(request)
-  .on('error', console.error)
-  .on('data', data =>
-    process.stdout.write(
-      data.results[0] && data.results[0].alternatives[0]
-        ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
-        : '\n\nReached transcription time limit, press Ctrl+C\n'
-    )
-  );
-
-//   spawn('node', ['index.js'], {
-//     env: {
-//         NODE_ENV: 'development',
-//         PATH: process.env.PATH
-//     }
-// })
-
-console.log('before recorder')
-recorder
-  .record({
-    sampleRateHertz: sampleRateHertz,
-    threshold: 0,
-    verbose: false,
-    recordProgram: 'rec', 
-    silence: '10.0',
-  })
-  .stream()
-  .on('error', console.error)
-  .pipe(recognizeStream);
-
-console.log('Listening, press Ctrl+C to stop.');
-console.log('after record')
+require('dotenv').config();
+  
+  const _ = require('lodash');
+  const speech = require('@google-cloud/speech');
+  const fs = require('fs');
+  
+  // Creates a client
+  const speechClient = new speech.SpeechClient();
+  
+  // The path to the audio file to transcribe
+  const filePath = 'C:/Users/Vijay/Downloads/WhatsApp Audio 2022-07-19 at 2.36.49 PM.wav';
+  
+  // Reads a local audio file and converts it to base64
+  const file = fs.readFileSync(filePath);
+  const audioBytes = file.toString('base64');
+  const audio = {
+    content: audioBytes,
+  };
+  
+  // The audio file's encoding, sample rate in hertz, and BCP-47 language code
+  const config = {
+    encoding: 'LINEAR16',
+    sampleRateHertz: 44100,
+    languageCode: 'en-US',
+  };
+  
+  const request = {
+    audio,
+    config,
+  };
+ 
+  // Detects speech in the audio file
+  speechClient
+    .recognize(request)
+    .then((data) => {
+      const results = _.get(data[0], 'results', []);
+      const transcription = results
+        .map(result => result.alternatives[0].transcript)
+        .join('\n');
+      console.log(`Transcription: ${transcription}`);
+    })
+    .catch(err => {
+      console.error('ERROR:', err);
+    });

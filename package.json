@@ -18,7 +18,9 @@
   "homepage": "https://github.com/SudarsanRamachandran/speech_to_text#readme",
   "dependencies": {
     "@google-cloud/speech": "^4.10.2",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "lodash": "^4.17.21",
     "node-record-lpcm16": "^1.0.1",
     "sox": "^0.1.0",
     "unoconv": "^0.1.2"
