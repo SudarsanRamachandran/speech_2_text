@@ -8,7 +8,7 @@ require('dotenv').config();
   const speechClient = new speech.SpeechClient();
   
   // The path to the audio file to transcribe
-  const filePath = 'C:/Users/Vijay/Downloads/WhatsApp Audio 2022-07-19 at 2.36.49 PM.wav';
+  const filePath = 'C:/Users/Vijay/Documents/GitHub/speech_2_text/WhatsApp Audio 2022-07-19 at 2.36.45 PM (1).wav';
   
   // Reads a local audio file and converts it to base64
   const file = fs.readFileSync(filePath);
