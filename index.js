@@ -2,20 +2,20 @@ require('dotenv').config();
   
   const _ = require('lodash');
   const speech = require('@google-cloud/speech');
-  const cloudStorage = require('@google-cloud/storage');
+  const {Storage} = require('@google-cloud/storage');
   const fs = require('fs');
   const path = require('path');
   
   const speechClient = new speech.SpeechClient();
   
   // The path to the audio file to transcribe
-  const filePath = 'C:/Users/Vijay/Documents/GitHub/speech_2_text/WhatsApp Audio 2022-07-19 at 2.36.45 PM (1).wav';
+  const filePath = 'C:/Users/Vijay/Downloads/537e85934e.wav';
   
   // Google Cloud storage
   const bucketName = 'wa-media-assets'; // Must exist in your Cloud Storage
   
   const uploadToGcs = async () => {
-    const storage = cloudStorage({
+    const storage = new Storage({
       projectId: 'organic-folder-355319'
     });
   
@@ -36,7 +36,7 @@ require('dotenv').config();
   
       const config = {
         encoding: 'LINEAR16',
-        sampleRateHertz: 24000,
+        sampleRateHertz: 44100,
         languageCode: 'en-US',
       };
   
